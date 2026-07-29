@@ -1,0 +1,289 @@
+openapi: 3.1.0
+info:
+  # Do not change the title, if the title changes, the import paths will be broken
+  title: Api
+  version: 0.1.0
+  description: API specification
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: check
+    description: JavaScript SEO render checks
+  - name: content
+    description: Editable site content
+paths:
+  /content:
+    get:
+      operationId: getContent
+      tags: [content]
+      summary: All content overrides
+      description: Returns every stored content entry keyed by content key.
+      responses:
+        "200":
+          description: Content map
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ContentMap"
+  /check:
+    post:
+      operationId: runCheck
+      tags: [check]
+      summary: Run a JavaScript SEO render check
+      description: Fetches a URL as raw HTML and as a rendered DOM, compares them, and returns findings.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CheckInput"
+      responses:
+        "200":
+          description: Check result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CheckResult"
+        "400":
+          description: Invalid URL or blocked target
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+        "429":
+          description: Rate limited
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+        "502":
+          description: Target site unreachable or render failed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+  /checks/recent:
+    get:
+      operationId: listRecentChecks
+      tags: [check]
+      summary: Recent checks
+      description: Returns the most recent public checks.
+      responses:
+        "200":
+          description: Recent checks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/RecentCheck"
+  /stats:
+    get:
+      operationId: getStats
+      tags: [check]
+      summary: Aggregate usage stats
+      description: Returns aggregate counts of checks and risk levels.
+      responses:
+        "200":
+          description: Stats
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CheckStats"
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+    ContentValue:
+      type: object
+      description: Free-form content payload (title, description, body markdown, arbitrary fields)
+      additionalProperties: true
+    ContentMap:
+      type: object
+      description: Map of content key to content value
+      additionalProperties:
+        $ref: "#/components/schemas/ContentValue"
+    ApiErrorResponse:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: string
+    CheckInput:
+      type: object
+      required: [url]
+      properties:
+        url:
+          type: string
+          minLength: 4
+          maxLength: 2048
+    Snapshot:
+      type: object
+      required:
+        - title
+        - metaDescription
+        - canonical
+        - metaRobots
+        - h1
+        - internalLinksCount
+        - wordCount
+        - structuredDataTypes
+        - imagesTotal
+        - imagesWithoutAlt
+        - htmlBytes
+      properties:
+        title:
+          type: ["string", "null"]
+        metaDescription:
+          type: ["string", "null"]
+        canonical:
+          type: ["string", "null"]
+        metaRobots:
+          type: ["string", "null"]
+        h1:
+          type: array
+          items:
+            type: string
+        internalLinksCount:
+          type: number
+        wordCount:
+          type: number
+        structuredDataTypes:
+          type: array
+          items:
+            type: string
+        imagesTotal:
+          type: number
+        imagesWithoutAlt:
+          type: number
+        htmlBytes:
+          type: number
+    Finding:
+      type: object
+      required: [id, severity, category, message]
+      properties:
+        id:
+          type: string
+        severity:
+          type: string
+          enum: [info, warning, critical]
+        category:
+          type: string
+        message:
+          type: string
+        rawValue:
+          type: ["string", "null"]
+        renderedValue:
+          type: ["string", "null"]
+    RedirectHop:
+      type: object
+      required: [url, status]
+      properties:
+        url:
+          type: string
+        status:
+          type: number
+    CheckResult:
+      type: object
+      required:
+        - id
+        - url
+        - finalUrl
+        - checkedAt
+        - httpStatus
+        - riskLevel
+        - riskScore
+        - findings
+        - raw
+        - rendered
+        - jsErrors
+        - blockedResources
+        - redirectChain
+        - renderMs
+      properties:
+        id:
+          type: number
+        url:
+          type: string
+        finalUrl:
+          type: string
+        checkedAt:
+          type: string
+        httpStatus:
+          type: number
+        riskLevel:
+          type: string
+          enum: [LOW, MEDIUM, HIGH]
+        riskScore:
+          type: number
+        findings:
+          type: array
+          items:
+            $ref: "#/components/schemas/Finding"
+        raw:
+          $ref: "#/components/schemas/Snapshot"
+        rendered:
+          $ref: "#/components/schemas/Snapshot"
+        jsErrors:
+          type: array
+          items:
+            type: string
+        blockedResources:
+          type: array
+          items:
+            type: string
+        redirectChain:
+          type: array
+          items:
+            $ref: "#/components/schemas/RedirectHop"
+        renderMs:
+          type: number
+    RecentCheck:
+      type: object
+      required: [id, url, riskLevel, httpStatus, checkedAt]
+      properties:
+        id:
+          type: number
+        url:
+          type: string
+        riskLevel:
+          type: string
+          enum: [LOW, MEDIUM, HIGH]
+        httpStatus:
+          type: number
+        checkedAt:
+          type: string
+    CheckStats:
+      type: object
+      required: [totalChecks, lowCount, mediumCount, highCount]
+      properties:
+        totalChecks:
+          type: number
+        lowCount:
+          type: number
+        mediumCount:
+          type: number
+        highCount:
+          type: number
+
