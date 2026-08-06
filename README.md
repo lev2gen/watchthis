@@ -4,6 +4,8 @@
 
 **Live:** [watchthis.dev](https://watchthis.dev)
 
+![WatchThis — compare raw HTML with the rendered DOM](docs/screenshot.png)
+
 ## What it does
 
 Paste a URL and WatchThis will:
@@ -63,6 +65,11 @@ PORT=3000 BASE_PATH=/ NODE_ENV=production pnpm --filter @workspace/watchthis run
 ```
 
 The frontend build prerenders every route to static HTML in `artifacts/watchthis/dist/public` and writes `sitemap.xml` and `robots.txt`. Serve that directory with any static server and proxy `/api/*` to the API server.
+
+## Roadmap & changelog
+
+- [ROADMAP.md](ROADMAP.md) — what's planned next
+- [CHANGELOG.md](CHANGELOG.md) — release history
 
 ## License
 
