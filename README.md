@@ -4,7 +4,7 @@
 
 **Live:** [watchthis.dev](https://watchthis.dev)
 
-![WatchThis — compare raw HTML with the rendered DOM](docs/screenshot.png)
+![WatchThis demo — enter a URL, run the check, get a risk verdict](docs/demo.gif)
 
 ## What it does
 
