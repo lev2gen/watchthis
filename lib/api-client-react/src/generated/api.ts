@@ -25,8 +25,7 @@ import type {
   CheckResult,
   CheckStats,
   ContentMap,
-  HealthStatus,
-  RecentCheck
+  HealthStatus
 } from './api.schemas';
 
 import { customFetch } from '../custom-fetch';
@@ -205,84 +204,6 @@ export const useRunCheck = <TError = ErrorType<ApiErrorResponse>,
       > => {
       return useMutation(getRunCheckMutationOptions(options));
     }
-
-export const getListRecentChecksUrl = () => {
-
-
-
-
-  return `/api/checks/recent`
-}
-
-/**
- * Returns the most recent public checks.
- * @summary Recent checks
- */
-export const listRecentChecks = async ( options?: Parameters<typeof customFetch>[1]): Promise<RecentCheck[]> => {
-
-  return customFetch<RecentCheck[]>(getListRecentChecksUrl(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
-
-
-
-
-export const getListRecentChecksQueryKey = () => {
-    return [
-    `/api/checks/recent`
-    ] as const;
-    }
-
-
-export const getListRecentChecksQueryOptions = <TData = Awaited<ReturnType<typeof listRecentChecks>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listRecentChecks>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getListRecentChecksQueryKey();
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof listRecentChecks>>> = ({ signal }) => listRecentChecks({ signal, ...requestOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listRecentChecks>>, TError, TData> & { queryKey: QueryKey }
-}
-
-export type ListRecentChecksQueryResult = NonNullable<Awaited<ReturnType<typeof listRecentChecks>>>
-export type ListRecentChecksQueryError = ErrorType<unknown>
-
-
-/**
- * @summary Recent checks
- */
-
-export function useListRecentChecks<TData = Awaited<ReturnType<typeof listRecentChecks>>, TError = ErrorType<unknown>>(
-  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listRecentChecks>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
-
- ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
-
-  const queryOptions = getListRecentChecksQueryOptions(options)
-
-  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
-
-  return withQueryKey(query, queryOptions.queryKey);
-}
-
-
-
-
-
-
 
 export const getGetStatsUrl = () => {
 

@@ -65,21 +65,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ApiErrorResponse"
-  /checks/recent:
-    get:
-      operationId: listRecentChecks
-      tags: [check]
-      summary: Recent checks
-      description: Returns the most recent public checks.
-      responses:
-        "200":
-          description: Recent checks
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/RecentCheck"
   /stats:
     get:
       operationId: getStats
@@ -259,21 +244,6 @@ components:
             $ref: "#/components/schemas/RedirectHop"
         renderMs:
           type: number
-    RecentCheck:
-      type: object
-      required: [id, url, riskLevel, httpStatus, checkedAt]
-      properties:
-        id:
-          type: number
-        url:
-          type: string
-        riskLevel:
-          type: string
-          enum: [LOW, MEDIUM, HIGH]
-        httpStatus:
-          type: number
-        checkedAt:
-          type: string
     CheckStats:
       type: object
       required: [totalChecks, lowCount, mediumCount, highCount]

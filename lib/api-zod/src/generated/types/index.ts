@@ -16,7 +16,5 @@ export * from './contentValue';
 export * from './finding';
 export * from './findingSeverity';
 export * from './healthStatus';
-export * from './recentCheck';
-export * from './recentCheckRiskLevel';
 export * from './redirectHop';
 export * from './snapshot';

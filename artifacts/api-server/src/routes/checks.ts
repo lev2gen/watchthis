@@ -1,7 +1,7 @@
 import { Router, type IRouter } from "express";
 import { desc, sql } from "drizzle-orm";
 import { db, checksTable } from "@workspace/db";
-import { RunCheckBody, RunCheckResponse, ListRecentChecksResponse, GetStatsResponse } from "@workspace/api-zod";
+import { RunCheckBody, RunCheckResponse, GetStatsResponse } from "@workspace/api-zod";
 import { assertPublicUrl, SsrfError } from "../lib/ssrf";
 import { runRenderCheck, CheckError, type CheckOutcome } from "../lib/checker";
 import { rateLimit } from "../lib/rateLimit";
@@ -80,26 +80,6 @@ router.post(
     res.json(payload);
   },
 );
-
-router.get("/checks/recent", async (_req, res): Promise<void> => {
-  const rows = await db
-    .select({
-      id: checksTable.id,
-      url: checksTable.url,
-      riskLevel: checksTable.riskLevel,
-      httpStatus: checksTable.httpStatus,
-      checkedAt: checksTable.checkedAt,
-    })
-    .from(checksTable)
-    .orderBy(desc(checksTable.checkedAt))
-    .limit(10);
-
-  res.json(
-    ListRecentChecksResponse.parse(
-      rows.map((r) => ({ ...r, checkedAt: r.checkedAt.toISOString() })),
-    ),
-  );
-});
 
 router.get("/stats", async (_req, res): Promise<void> => {
   const [row] = await db

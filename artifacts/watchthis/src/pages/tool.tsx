@@ -12,12 +12,10 @@ import { Separator } from '@/components/ui/separator';
 import { Progress } from '@/components/ui/progress';
 import {
   useRunCheck,
-  useListRecentChecks,
   useGetStats,
-  getListRecentChecksQueryKey,
   getGetStatsQueryKey,
 } from '@workspace/api-client-react';
-import type { CheckResult, RecentCheck, CheckStats } from '@workspace/api-client-react';
+import type { CheckResult, CheckStats } from '@workspace/api-client-react';
 import {
   AlertTriangle,
   CheckCircle2,
@@ -27,7 +25,6 @@ import {
   Search,
   ExternalLink,
   TrendingUp,
-  Clock,
 } from 'lucide-react';
 import { format } from 'date-fns';
 
@@ -38,7 +35,6 @@ export default function Tool() {
   const [result, setResult] = useState<CheckResult | null>(null);
 
   const runCheck = useRunCheck();
-  const { data: recentChecks } = useListRecentChecks();
   const { data: stats } = useGetStats();
 
   useEffect(() => {
@@ -60,7 +56,6 @@ export default function Tool() {
       {
         onSuccess: (data) => {
           setResult(data);
-          queryClient.invalidateQueries({ queryKey: getListRecentChecksQueryKey() });
           queryClient.invalidateQueries({ queryKey: getGetStatsQueryKey() });
         },
       }
@@ -391,43 +386,6 @@ export default function Tool() {
 
             {/* Sidebar Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
-              {/* Recent Checks */}
-              {recentChecks && recentChecks.length > 0 && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Clock className="w-5 h-5" />
-                      Recent Checks
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      {recentChecks.slice(0, 5).map((check) => (
-                        <button
-                          key={check.id}
-                          onClick={() => {
-                            setUrl(check.url);
-                            handleCheck(check.url);
-                          }}
-                          className="w-full text-left p-3 bg-muted/30 hover:bg-muted/50 border border-border rounded transition-colors"
-                          data-testid={`button-recent-check-${check.id}`}
-                        >
-                          <div className="flex items-center justify-between mb-1">
-                            <span className="text-sm font-mono truncate flex-1">{check.url}</span>
-                            <Badge variant={check.riskLevel === 'HIGH' ? 'destructive' : check.riskLevel === 'MEDIUM' ? 'default' : 'secondary'} className="ml-2 text-xs">
-                              {check.riskLevel}
-                            </Badge>
-                          </div>
-                          <div className="text-xs text-muted-foreground">
-                            {format(new Date(check.checkedAt), 'PPp')}
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-
               {/* Stats */}
               {stats && (
                 <Card>

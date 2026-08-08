@@ -100,23 +100,6 @@ export interface CheckResult {
   renderMs: number;
 }
 
-export type RecentCheckRiskLevel = typeof RecentCheckRiskLevel[keyof typeof RecentCheckRiskLevel];
-
-
-export const RecentCheckRiskLevel = {
-  LOW: 'LOW',
-  MEDIUM: 'MEDIUM',
-  HIGH: 'HIGH',
-} as const;
-
-export interface RecentCheck {
-  id: number;
-  url: string;
-  riskLevel: RecentCheckRiskLevel;
-  httpStatus: number;
-  checkedAt: string;
-}
-
 export interface CheckStats {
   totalChecks: number;
   lowCount: number;

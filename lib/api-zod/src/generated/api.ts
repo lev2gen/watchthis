@@ -81,20 +81,6 @@ export const RunCheckResponse = zod.object({
 
 
 /**
- * Returns the most recent public checks.
- * @summary Recent checks
- */
-export const ListRecentChecksResponseItem = zod.object({
-  "id": zod.number(),
-  "url": zod.string(),
-  "riskLevel": zod.enum(['LOW', 'MEDIUM', 'HIGH']),
-  "httpStatus": zod.number(),
-  "checkedAt": zod.string()
-})
-export const ListRecentChecksResponse = zod.array(ListRecentChecksResponseItem)
-
-
-/**
  * Returns aggregate counts of checks and risk levels.
  * @summary Aggregate usage stats
  */
